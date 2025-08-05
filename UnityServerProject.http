@@ -1,6 +1,39 @@
-@UnityServerProject_HostAddress = http://localhost:5139
+@UnityServerProject_HostAddress = https://localhost:7185
 
 GET {{UnityServerProject_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+POST {{UnityServerProject_HostAddress}}/todoitems
+Content-Type:application/json
+{
+  "name":"walk dog",
+  "isComplete":true
+}
+###
+
+GET {{UnityServerProject_HostAddress}}/todoitems
+
+###
+
+GET {{UnityServerProject_HostAddress}}/todoitems/complete
+
+###
+
+GET {{UnityServerProject_HostAddress}}/todoitems/1
+
+###
+
+PUT {{UnityServerProject_HostAddress}}/todoitems/1
+Content-Type:application/json
+{
+  "name":"change dog",
+  "isComplete":true
+}
+
+###
+
+DELETE {{UnityServerProject_HostAddress}}/todoitems/2
 
 ###
