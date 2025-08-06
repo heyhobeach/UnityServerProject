@@ -8,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //useinmemoryDatabase가 나중에 배포시에도 사용해도 되는지 메모리에 저장되는거라면 안 될거같은 느낌임
-builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+//builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+//builder.Services.AddMvc();//?
+var connectionstring = builder.Configuration.GetConnectionString("UserDb");
+//builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseMySQL(connectionstring,serververs));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //자습서에서 현재 안 쓰는듯?
 //builder.Services.AddControllers();
