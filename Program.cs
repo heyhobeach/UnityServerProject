@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //useinmemoryDatabase가 나중에 배포시에도 사용해도 되는지 메모리에 저장되는거라면 안 될거같은 느낌임
-builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //자습서에서 현재 안 쓰는듯?
 //builder.Services.AddControllers();
@@ -18,33 +18,36 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
 
-var todoItems = app.MapGroup("/todoItems");
-app.MapGet("/todoitems", async (TodoDb db) => await db.Todos.ToListAsync());
-app.MapGet("/todoitems/complete", async (TodoDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) => await db.Todos.FindAsync(id) is Todo todo ? Results.Ok(todo) : Results.NotFound());
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) => { 
+var userPlayData = app.MapGroup("/userPlayData");
+app.MapGet("/userPlayData", async (PlaytestDb db) => await db.Todos.ToListAsync());
+//app.MapGet("/userPlayData/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
+app.MapGet("/userPlayData/{id}", async (int id, PlaytestDb db) => await db.Todos.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
+app.MapPost("/userPlayData", async (Playresult todo, PlaytestDb db) => { 
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
-    return Results.Created($"/todoitems/{todo.Id}", todo);
+    return Results.Created($"/userPlayData/{todo.Id}", todo);
 });
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) => {
-    var todo = await db.Todos.FindAsync(id);
-    if(todo is null)
+
+app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb db) => {
+    var data = await db.Todos.FindAsync(id);
+    if(data is null)
     {
         return Results.NotFound();
     }
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
+    data.IsNormal = inputData.IsNormal;
+    data.StartTime = inputData.StartTime;
+    data.EndTime = inputData.EndTime;
+    data.DeadCount = inputData.DeadCount;
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
+app.MapDelete("/userPlayData/{id}", async (int id, PlaytestDb db) =>
 {
     if (id == 100)
     {
         id = await db.Todos.OrderByDescending(t => t.Id).Select(t=>t.Id).FirstOrDefaultAsync();
     }
-    if (await db.Todos.FindAsync(id) is Todo todo)
+    if (await db.Todos.FindAsync(id) is Playresult todo)
     {
         db.Todos.Remove(todo);
         await db.SaveChangesAsync();
