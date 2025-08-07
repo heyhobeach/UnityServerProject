@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using UnityServerProject.Data;
 using UnityServerProject.Model;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 //builder.Services.AddMvc();//?
 var connectionstring = builder.Configuration.GetConnectionString("UserDb");
-//builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseMySQL(connectionstring,serververs));
+builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseMySQL(connectionstring,serverve));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //자습서에서 현재 안 쓰는듯?
 //builder.Services.AddControllers();
