@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using UnityServerProject.Data;
 using UnityServerProject.Model;
 
@@ -11,8 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 //useinmemoryDatabase가 나중에 배포시에도 사용해도 되는지 메모리에 저장되는거라면 안 될거같은 느낌임
 //builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 //builder.Services.AddMvc();//?
-var connectionstring = builder.Configuration.GetConnectionString("UserDb");
-builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseMySQL(connectionstring,serverve));
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 21)); // MySQL version 8.0.21 or higher is recommended
+builder.Services.AddDbContext<PlaytestDb>(opt =>
+{
+    var connectionstring = builder.Configuration.GetConnectionString("UserDb");
+    if (connectionstring == null)
+    {
+        throw new InvalidOperationException("Connection string 'UserDb' not found. Please add it to your appsettings.json or environment variables.");
+    }
+    opt.UseMySql(connectionstring, ServerVersion.AutoDetect(connectionstring));
+});
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //자습서에서 현재 안 쓰는듯?
 //builder.Services.AddControllers();
@@ -26,15 +36,17 @@ var userPlayData = app.MapGroup("/userPlayData");
 app.MapGet("/userPlayData", async (PlaytestDb db) => await db.Todos.ToListAsync());
 //app.MapGet("/userPlayData/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
 app.MapGet("/userPlayData/{id}", async (int id, PlaytestDb db) => await db.Todos.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
-app.MapPost("/userPlayData", async (Playresult todo, PlaytestDb db) => { 
+app.MapPost("/userPlayData", async (Playresult todo, PlaytestDb db) =>
+{
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
     return Results.Created($"/userPlayData/{todo.Id}", todo);
 });
 
-app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb db) => {
+app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb db) =>
+{
     var data = await db.Todos.FindAsync(id);
-    if(data is null)
+    if (data is null)
     {
         return Results.NotFound();
     }
@@ -49,7 +61,7 @@ app.MapDelete("/userPlayData/{id}", async (int id, PlaytestDb db) =>
 {
     if (id == 100)
     {
-        id = await db.Todos.OrderByDescending(t => t.Id).Select(t=>t.Id).FirstOrDefaultAsync();
+        id = await db.Todos.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
     }
     if (await db.Todos.FindAsync(id) is Playresult todo)
     {
