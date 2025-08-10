@@ -7,6 +7,6 @@ namespace UnityServerProject.Data
         {
         }
 
-        public DbSet<Model.Playresult> Todos => Set<Model.Playresult>();
+        public DbSet<Model.Playresult> UserPlayData => Set<Model.Playresult>();//데이터 베이스쪽이랑 동일해야함
     }
 }

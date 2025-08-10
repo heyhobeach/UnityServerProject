@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 
-//useinmemoryDatabase°¡ ³ªÁß¿¡ ¹èÆ÷½Ã¿¡µµ »ç¿ëÇØµµ µÇ´ÂÁö ¸Þ¸ð¸®¿¡ ÀúÀåµÇ´Â°Å¶ó¸é ¾È µÉ°Å°°Àº ´À³¦ÀÓ
+//useinmemoryDatabaseï¿½ï¿½ ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Øµï¿½ ï¿½Ç´ï¿½ï¿½ï¿½ ï¿½Þ¸ð¸®¿ï¿½ ï¿½ï¿½ï¿½ï¿½Ç´Â°Å¶ï¿½ï¿½ ï¿½ï¿½ ï¿½É°Å°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 //builder.Services.AddMvc();//?
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 21)); // MySQL version 8.0.21 or higher is recommended
@@ -24,7 +24,7 @@ builder.Services.AddDbContext<PlaytestDb>(opt =>
     opt.UseMySql(connectionstring, ServerVersion.AutoDetect(connectionstring));
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-//ÀÚ½À¼­¿¡¼­ ÇöÀç ¾È ¾²´Âµí?
+//ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Âµï¿½?
 //builder.Services.AddControllers();
 //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -33,19 +33,19 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 var userPlayData = app.MapGroup("/userPlayData");
-app.MapGet("/userPlayData", async (PlaytestDb db) => await db.Todos.ToListAsync());
+app.MapGet("/userPlayData", async (PlaytestDb db) => await db.UserPlayData.ToListAsync());
 //app.MapGet("/userPlayData/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
-app.MapGet("/userPlayData/{id}", async (int id, PlaytestDb db) => await db.Todos.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
-app.MapPost("/userPlayData", async (Playresult todo, PlaytestDb db) =>
+app.MapGet("/userPlayData/{id}", async (int id, PlaytestDb db) => await db.UserPlayData.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
+app.MapPost("/userPlayData", async (Playresult data, PlaytestDb db) =>
 {
-    db.Todos.Add(todo);
+    db.UserPlayData.Add(data);
     await db.SaveChangesAsync();
-    return Results.Created($"/userPlayData/{todo.Id}", todo);
+    return Results.Created($"/userPlayData/{data.Id}", data);
 });
 
 app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb db) =>
 {
-    var data = await db.Todos.FindAsync(id);
+    var data = await db.UserPlayData.FindAsync(id);
     if (data is null)
     {
         return Results.NotFound();
@@ -61,11 +61,11 @@ app.MapDelete("/userPlayData/{id}", async (int id, PlaytestDb db) =>
 {
     if (id == 100)
     {
-        id = await db.Todos.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
+        id = await db.UserPlayData.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
     }
-    if (await db.Todos.FindAsync(id) is Playresult todo)
+    if (await db.UserPlayData.FindAsync(id) is Playresult todo)
     {
-        db.Todos.Remove(todo);
+        db.UserPlayData.Remove(todo);
         await db.SaveChangesAsync();
         return Results.NoContent();
     }

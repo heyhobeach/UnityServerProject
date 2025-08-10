@@ -9,6 +9,7 @@ POST {{UnityServerProject_HostAddress}}/userPlayData
 Content-Type:application/json
 
 {
+  "IsNormal":false,
   "startTime": 0,
   "endTime": 10.4,
   "deadCount": 0
