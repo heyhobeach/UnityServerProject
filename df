@@ -1,0 +1,71 @@
+[33mcommit 2a51cfa205817ab5323d977ef80d7e34f0cf0956[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Sun Aug 10 01:16:22 2025 +0900
+
+    .
+
+[33mcommit 73b508fd40bb17407d268ab45fbf91b742ab6e92[m
+Author: heyhobeach <72774909+heyhobeach@users.noreply.github.com>
+Date:   Fri Aug 8 22:18:51 2025 +0900
+
+    Update Program.cs
+
+[33mcommit 99a1116b8df1b9198f4e7a96b457ba9a564e29e0[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Fri Aug 8 12:46:24 2025 +0900
+
+    Update Program.cs
+
+[33mcommit 108878ae480027ce4d010f1b946e2540d3b4cd50[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Thu Aug 7 15:06:43 2025 +0900
+
+    Add EF Core tools and MySQL provider packages
+    
+    Added Microsoft.EntityFrameworkCore.Tools, Pomelo.EntityFrameworkCore.MySql, and UnitOfWork.EntityFramWorkCore packages to the project. Also updated Program.cs to use MySQL for PlaytestDb context. These changes enable MySQL support and provide additional EF Core tooling for development.
+
+[33mcommit f09b51b959bb5fe0475557371893043d9b655cf1[m
+Author: heyhobeach <72774909+heyhobeach@users.noreply.github.com>
+Date:   Thu Aug 7 00:49:43 2025 +0900
+
+    Add MySQL support and connection string configuration
+    
+    Added MySql.Data.EntityFrameworkCore package to project dependencies and introduced a MySQL connection string in appsettings.json. Updated Program.cs to prepare for switching from in-memory to MySQL database usage.
+
+[33mcommit f813aa198181fbabb978ea565bf29fb1a0214057[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Thu Aug 7 00:06:10 2025 +0900
+
+    Refactor Todo API to Playtest API
+    
+    Replaced TodoDb and Todo model with PlaytestDb and Playresult model to shift API focus from todo items to user play data. Updated endpoints and HTTP requests to reflect new data structure and removed unused todo-related code.
+
+[33mcommit fdb593b005b527470122c7fc9f85c7c001dcb158[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Tue Aug 5 16:16:07 2025 +0900
+
+    Add PUT and DELETE endpoints for todo items
+    
+    Implemented PUT and DELETE endpoints for managing todo items in Program.cs, allowing updates and deletions by ID. Updated UnityServerProject.http with requests for the new endpoints and changed the host address to use HTTPS. Commented out unused pipeline configuration for clarity.
+
+[33mcommit b890a4c3211686b137d1c1b42fa249034df0f23f[m
+Author: heyhobeach <72774909+heyhobeach@users.noreply.github.com>
+Date:   Tue Aug 5 00:29:01 2025 +0900
+
+    Add minimal API endpoints and solution file
+    
+    Introduced basic CRUD endpoints for Todo items in Program.cs using minimal APIs. Added missing package reference for EntityFramework diagnostics. Created a new Visual Studio solution file for the project.
+
+[33mcommit 17186abf534134714fb26962676af4b1abbc923d[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Mon Aug 4 23:54:19 2025 +0900
+
+    Add Todo model and in-memory database setup
+    
+    Introduced the Todo entity and TodoDb context for managing todos using Entity Framework Core. Configured the application to use an in-memory database for Todo items and added the necessary EF Core package.
+
+[33mcommit b58a774d5f759d8c73e4541f2e94128ae74579c4[m
+Author: heyhobeach <zxc120021@gmail.com>
+Date:   Mon Aug 4 18:24:21 2025 +0900
+
+    Initial commit

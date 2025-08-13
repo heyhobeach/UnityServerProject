@@ -32,20 +32,20 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-var userPlayData = app.MapGroup("/userPlayData");
-app.MapGet("/userPlayData", async (PlaytestDb db) => await db.UserPlayData.ToListAsync());
-//app.MapGet("/userPlayData/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
-app.MapGet("/userPlayData/{id}", async (int id, PlaytestDb db) => await db.UserPlayData.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
-app.MapPost("/userPlayData", async (Playresult data, PlaytestDb db) =>
+var userplaydata = app.MapGroup("/userplaydata");
+app.MapGet("/userplaydata", async (PlaytestDb db) => await db.userplaydata.ToListAsync());
+//app.MapGet("/userplaydata/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
+app.MapGet("/userplaydata/{id}", async (int id, PlaytestDb db) => await db.userplaydata.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
+app.MapPost("/userplaydata", async (Playresult data, PlaytestDb db) =>
 {
-    db.UserPlayData.Add(data);
+    db.userplaydata.Add(data);
     await db.SaveChangesAsync();
-    return Results.Created($"/userPlayData/{data.Id}", data);
+    return Results.Created($"/userplaydata/{data.Id}", data);
 });
 
-app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb db) =>
+app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb db) =>
 {
-    var data = await db.UserPlayData.FindAsync(id);
+    var data = await db.userplaydata.FindAsync(id);
     if (data is null)
     {
         return Results.NotFound();
@@ -57,15 +57,15 @@ app.MapPut("/userPlayData/{id}", async (int id, Playresult inputData, PlaytestDb
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
-app.MapDelete("/userPlayData/{id}", async (int id, PlaytestDb db) =>
+app.MapDelete("/userplaydata/{id}", async (int id, PlaytestDb db) =>
 {
     if (id == 100)
     {
-        id = await db.UserPlayData.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
+        id = await db.userplaydata.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
     }
-    if (await db.UserPlayData.FindAsync(id) is Playresult todo)
+    if (await db.userplaydata.FindAsync(id) is Playresult todo)
     {
-        db.UserPlayData.Remove(todo);
+        db.userplaydata.Remove(todo);
         await db.SaveChangesAsync();
         return Results.NoContent();
     }
@@ -74,13 +74,14 @@ app.MapDelete("/userPlayData/{id}", async (int id, PlaytestDb db) =>
 
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+   app.UseSwagger();
+   app.UseSwaggerUI();
+}
 
-//app.UseHttpsRedirection();
+//도커 테스트용 해당 내용들어가면 괜찮다던데
+app.UseHttpsRedirection();
 //
 //app.UseAuthorization();
 //
