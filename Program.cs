@@ -16,11 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 21)); // MySQL version 8.0.21 or higher is recommended
 builder.Services.AddDbContext<PlaytestDb>(opt =>
 {
-    var connectionstring = builder.Configuration.GetConnectionString("UserDb");
+    var connectionstring = builder.Configuration.GetConnectionString("UserDb");//mysql 설정에 대해서 appsettings.json에 작성되어 있음  현재 나는 JackTheReaperDB라는 데이터베이스를 사용하지만 appsettings에서는 UserDb로 정리 되어있음
     if (connectionstring == null)
     {
+        //만약 데이터 베이스로 들어가는 connectonstring이 비어있다면 예외처리 발생 시킴
         throw new InvalidOperationException("Connection string 'UserDb' not found. Please add it to your appsettings.json or environment variables.");
     }
+    //Pomelo.EntityFrameworkCore.MySql.Infrastructure.ServerVersion.AutoDetect(connectionstring) 를 사용하면 MySQL 서버 버전을 감지하고 입력함
+    //UseMySql 함수를 사용 했으며 해당 함수의 인자로는 데이터베이스 접속을 위한 설정과, 서버 버전을 입력하게됨
     opt.UseMySql(connectionstring, ServerVersion.AutoDetect(connectionstring));
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -31,7 +34,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+//
+//minimal api사용중이며 각 요청별로 내용을 정리한것임
+//minimal api에서 의존성 주입을 자체적으로 진행해서 이렇게 사용 가능함
 var userplaydata = app.MapGroup("/userplaydata");
 app.MapGet("/userplaydata", async (PlaytestDb db) => await db.userplaydata.ToListAsync());
 //app.MapGet("/userplaydata/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
@@ -59,10 +64,10 @@ app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb
 });
 app.MapDelete("/userplaydata/{id}", async (int id, PlaytestDb db) =>
 {
-    if (id == 100)
-    {
-        id = await db.userplaydata.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
-    }
+    // if (id == 100)
+    // {
+    //     id = await db.userplaydata.OrderByDescending(t => t.Id).Select(t => t.Id).FirstOrDefaultAsync();
+    // }
     if (await db.userplaydata.FindAsync(id) is Playresult todo)
     {
         db.userplaydata.Remove(todo);
