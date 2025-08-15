@@ -31,7 +31,7 @@ services:
       context: .
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "80:8080"
     environment:
       # ★ 수정 2: 연결 문자열 이름을 'UserDb'로 변경 (Program.cs와 일치)
       # ★ 수정 3: 비밀번호를 위 MYSQL_ROOT_PASSWORD와 동일하게 변경
