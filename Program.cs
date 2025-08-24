@@ -5,7 +5,7 @@ using UnityServerProject.Data;
 using UnityServerProject.Model;
 
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -76,6 +76,29 @@ app.MapDelete("/userplaydata/{id}", async (int id, PlaytestDb db) =>
     }
     return Results.NotFound();
 });
+app.MapPatch("userplaydata/{id}/EndTime", async (int id, EndTimeUpdateRequest _EndTime, PlaytestDb db) =>
+{
+    var data = await db.userplaydata.FindAsync(id);
+    if (data is null)
+    {
+        return Results.NotFound();
+    }
+    data.EndTime = _EndTime.EndTime;
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+app.MapPatch("userplaydata/{id}/Death", async (int id, PlaytestDb db) =>
+{
+    var data = await db.userplaydata.FindAsync(id);
+    if (data is null)
+    {
+        return Results.NotFound();
+    }
+    data.DeadCount++;
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 
 
 // Configure the HTTP request pipeline.
