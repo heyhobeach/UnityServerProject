@@ -10,4 +10,9 @@
         public float EndTime { get; set; }
         public int DeadCount { get; set; }
     }
+
+    public class EndTimeUpdateRequest
+    {
+        public float EndTime{ get; set; }
+    }
 }
