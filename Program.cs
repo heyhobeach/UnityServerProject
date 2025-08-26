@@ -86,7 +86,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //도커 테스트용 해당 내용들어가면 괜찮다던데
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 //
 //app.UseAuthorization();
 //
