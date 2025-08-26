@@ -39,8 +39,8 @@ DROP TABLE IF EXISTS `userplaydata`;
 CREATE TABLE `userplaydata` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `IsNormal` tinyint DEFAULT NULL,
-  `StartTime` float DEFAULT NULL,
-  `EndTime` float DEFAULT NULL,
+  `StartTime` BIGINT DEFAULT NULL,
+  `EndTime` BIGINT DEFAULT NULL,
   `DeadCount` int DEFAULT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

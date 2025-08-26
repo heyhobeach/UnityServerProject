@@ -27,7 +27,7 @@ builder.Services.AddDbContext<PlaytestDb>(opt =>
     opt.UseMySql(connectionstring, ServerVersion.AutoDetect(connectionstring));
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-//�ڽ������� ���� �� ���µ�?
+//�ڽ������� ���� �� ���µ�? 테스트
 //builder.Services.AddControllers();
 //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
