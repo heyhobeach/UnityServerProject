@@ -1,43 +1,42 @@
-# YAML 파일의 버전을 명시합니다.
-version: '3.8'
+# version 속성은 삭제합니다.
 
-# 실행할 서비스(컨테이너)들을 정의합니다.
 services:
   # --- 1. MySQL 데이터베이스 서비스 ---
+  # 역할: 순수한 데이터베이스. 안정적인 공식 mysql:8.0 이미지를 사용합니다.
   db:
     image: mysql:8.0
     container_name: jack-the-reaper-db
     environment:
-      # ★ 수정 1: 안전한 비밀번호로 변경 (특수문자 없음)
       MYSQL_ROOT_PASSWORD: JTRDBpw12
       MYSQL_DATABASE: JackTheReaperDB
     ports:
-      # 이 부분은 주석 처리하거나 삭제해도 됩니다.
-      # DB에 직접 접속할 일이 없다면 외부로 노출할 필요가 없습니다.
       - "3306:3306"
     volumes:
       - ./Database:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
-    # DB가 완전히 준비될 때까지 다른 컨테이너가 기다리도록 설정
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
 
   # --- 2. .NET API 서비스 ---
+  # 역할: .NET API 서버.
+  # build 설정을 통해 Dockerfile로 이미지를 빌드하고,
+  # image 설정을 통해 그 결과물에 heyhobeach/jackthereaperdb:latest 라는 이름을 붙입니다.
   api:
     container_name: jack-the-reaper-api
+    # ★★★ 핵심 1: 현재 폴더의 Dockerfile로 API 이미지를 빌드합니다. ★★★
     build: 
       context: .
+    # ★★★ 핵심 2: 빌드된 API 이미지에 원하시는 이 이름을 붙입니다. ★★★
+    image: heyhobeach/jackthereaperdb:latest
     restart: unless-stopped
     ports:
       - "80:8080"
     environment:
-      # ★ 수정 2: 연결 문자열 이름을 'UserDb'로 변경 (Program.cs와 일치)
-      # ★ 수정 3: 비밀번호를 위 MYSQL_ROOT_PASSWORD와 동일하게 변경
-      - ConnectionStrings__UserDb=server=db;port=3306;database=JackTheReaperDB;user=JackTheReaperDB;password=JTRDBpw12
+      # ★★★ 핵심 3: DB에 접속하려면 user를 'root'로 해야 합니다. ★★★
+      - ConnectionStrings__UserDb=server=db;port=3306;database=JackTheReaperDB;user=root;password=JTRDBpw12
     depends_on:
-      # 'db' 서비스의 healthcheck가 성공한 후에 'api' 서비스를 시작합니다.
       db:
         condition: service_healthy
 
