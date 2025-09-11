@@ -6,7 +6,7 @@
 
         public bool IsNormal { get; set; }
         public long StartTime { get; set; }
-
+        //수정
         public long EndTime { get; set; }
         public int DeadCount { get; set; }
     }
