@@ -7,7 +7,7 @@ services:
     image: mysql:8.0
     container_name: jack-the-reaper-db
     environment:
-      MYSQL_ROOT_PASSWORD: JTRDBpw12
+      MYSQL_ROOT_PASSWORD: 
       MYSQL_DATABASE: JackTheReaperDB
     ports:
       - "3306:3306"
@@ -35,7 +35,7 @@ services:
       - "80:8080"
     environment:
       # ★★★ 핵심 3: DB에 접속하려면 user를 'root'로 해야 합니다. ★★★
-      - ConnectionStrings__UserDb=server=db;port=3306;database=JackTheReaperDB;user=root;password=JTRDBpw12
+      - ConnectionStrings__UserDb=server=db;port=3306;database=JackTheReaperDB;user=root;password=
     depends_on:
       db:
         condition: service_healthy
