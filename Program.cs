@@ -38,7 +38,10 @@ var app = builder.Build();
 //minimal api사용중이며 각 요청별로 내용을 정리한것임
 //minimal api에서 의존성 주입을 자체적으로 진행해서 이렇게 사용 가능함
 var userplaydata = app.MapGroup("/userplaydata");
-app.MapGet("/userplaydata", async (PlaytestDb db) => await db.userplaydata.ToListAsync());
+app.MapGet("/userplaydata", async (PlaytestDb db) =>{
+    // Console.WriteLine("데이터 출력");
+    await db.userplaydata.ToListAsync();
+});
 //app.MapGet("/userplaydata/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
 app.MapGet("/userplaydata/{id}", async (int id, PlaytestDb db) => await db.userplaydata.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
 app.MapPost("/userplaydata", async (Playresult data, PlaytestDb db) =>
@@ -51,6 +54,7 @@ app.MapPost("/userplaydata", async (Playresult data, PlaytestDb db) =>
 app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb db) =>
 {
     var data = await db.userplaydata.FindAsync(id);
+    //var stagedata = await db.userStageDeathInfo.FindAsync(id);
     if (data is null)
     {
         return Results.NotFound();
@@ -59,6 +63,8 @@ app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb
     data.StartTime = inputData.StartTime;
     data.EndTime = inputData.EndTime;
     data.DeadCount = inputData.DeadCount;
+    // data.QuizResults=inputData.QuizResults;
+    // data.stageDeaths=inputData.stageDeaths; //여기 부분은 어떻게 해야하지 
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
@@ -98,7 +104,22 @@ app.MapPatch("userplaydata/{id}/Death", async (int id, PlaytestDb db) =>
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
+app.MapPatch("userplaydata/{id}/stageDeath",async(int id,StageDeathInfo info ,PlaytestDb db) =>
+{
+    //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
 
+
+    // var data = await db.userStageDeathInfo.FindAsync(id);
+    // if (data is null)
+    // {
+    //     return Results.NotFound();
+    // }
+    // data.StageName = info.StageName;
+    // data.DeathInfos=info.DeathInfos;
+    // data.DeathCount=info.DeathCount;
+    // await db.SaveChangesAsync();
+    return Results.NoContent();
+});
 
 
 // Configure the HTTP request pipeline.
