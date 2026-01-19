@@ -38,9 +38,10 @@ var app = builder.Build();
 //minimal api사용중이며 각 요청별로 내용을 정리한것임
 //minimal api에서 의존성 주입을 자체적으로 진행해서 이렇게 사용 가능함
 var userplaydata = app.MapGroup("/userplaydata");
+// access denied 되어 있는데 왜 그럴까 로컬에서 접속은 문제 없는데 
 app.MapGet("/userplaydata", async (PlaytestDb db) =>{
-    // Console.WriteLine("데이터 출력");
-    await db.userplaydata.ToListAsync();
+    await db.userplaydata.ToListAsync();//여기가 이제 문제 같아 보이는데
+    Console.WriteLine("데이터 출력");
 });
 //app.MapGet("/userplaydata/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
 app.MapGet("/userplaydata/{id}", async (int id, PlaytestDb db) => await db.userplaydata.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
@@ -104,6 +105,56 @@ app.MapPatch("userplaydata/{id}/Death", async (int id, PlaytestDb db) =>
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
+
+//주소는 문제없어 보이는데 아마 전송하는 인자 전달이 모자라서 그런듯
+app.MapPatch("userplaydata/stageDeath",async(HttpRequest request,PlaytestDb db) =>//StageDeathInfos info
+{
+    //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
+
+    
+
+    // var data = await db.userStageDeathInfo.FindAsync(id);
+    // if (data is null)
+    // {
+    //     return Results.NotFound();
+    // }
+    // data.StageName = info.StageName;
+    // data.DeathInfos=info.DeathInfos;
+    // data.DeathCount=info.DeathCount;
+    // await db.SaveChangesAsync();
+    // Console.WriteLine($"stageDeath info \n {info.StageName}, {info.}");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
+    Console.WriteLine("========================================");
+    // Console.WriteLine(info.stageDeathInfos.Count);//보내도 자꾸 개수가 0이라고 나오네 클라이언트에서는 0이라고 나오면 안 되긴함
+    
+    using (var reader = new StreamReader(request.Body))
+    {
+        var body = await reader.ReadToEndAsync();
+        Console.WriteLine("=== 받은 JSON ===");
+        Console.WriteLine(body);
+    }
+    // Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[0].StageName}");
+    // Console.WriteLine($"[Stage Receipt] 총 사망 횟수: {info.stageDeathInfos[0].DeathCount}");
+    // Console.WriteLine($"[Stage Receipt] 연결된 플레이 ID: {info.stageDeathInfos[0].PlayresultId}");
+    
+    // // 2. 리스트(DeathInfos) 내부 데이터 상세 출력
+    // if (info.stageDeathInfos[0].DeathInfos != null && info.stageDeathInfos[0].DeathInfos.Count > 0)
+    // {
+    //     Console.WriteLine($"--- 상세 사망 정보 ({info.stageDeathInfos[0].DeathInfos.Count}건) ---");
+    //     foreach (var death in info.stageDeathInfos[0].DeathInfos)
+    //     {
+    //         Console.WriteLine($"- 원인 적: {death.EnemyName}");
+    //         Console.WriteLine($"  내 위치: ({death.DeathPositionX}, {death.DeathPositionY})");
+    //         Console.WriteLine($"  적 위치: ({death.EnemyPositionX}, {death.EnemyPositionY})");
+    //     }
+    // }
+    // else
+    // {
+    //     Console.WriteLine("--- 상세 사망 정보가 없습니다. ---");
+    // }
+    Console.WriteLine("========================================");
+    return Results.NoContent();
+});
+
 app.MapPatch("userplaydata/{id}/stageDeath",async(int id,StageDeathInfo info ,PlaytestDb db) =>
 {
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
@@ -118,6 +169,7 @@ app.MapPatch("userplaydata/{id}/stageDeath",async(int id,StageDeathInfo info ,Pl
     // data.DeathInfos=info.DeathInfos;
     // data.DeathCount=info.DeathCount;
     // await db.SaveChangesAsync();
+    Console.WriteLine($"{id} 번 stageDeath ");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
     return Results.NoContent();
 });
 
