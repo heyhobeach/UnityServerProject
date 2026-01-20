@@ -17,7 +17,7 @@ namespace UnityServerProject.Model
 
     public class StageDeathInfos
     {
-        public List<StageDeathInfo> stageDeathInfos = new List<StageDeathInfo>();
+        public List<StageDeathInfo> stageDeathInfos{get;set;} = new List<StageDeathInfo>();
     } 
 
 
