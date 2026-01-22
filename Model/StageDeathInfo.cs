@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
 namespace UnityServerProject.Model
 {
@@ -40,6 +41,9 @@ namespace UnityServerProject.Model
         [Key]   
         public int DeathId{get;set;}
         public int StageId{get;set;}
+
+        [ForeignKey("StageId")]
+        public StageDeathInfo StageDeathInfo { get; set; }
 
         public string ?EnemyName { get; set; }
         public float DeathPositionX{get;set;}

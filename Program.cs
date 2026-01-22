@@ -108,6 +108,7 @@ app.MapPatch("userplaydata/{id}/Death", async (int id, PlaytestDb db) =>
 });
 
 //주소는 문제없어 보이는데 아마 전송하는 인자 전달이 모자라서 그런듯
+//해당 내용은 id없이 전송하는것이기 때문에 이 내용이 필요한지 1차 의문
 app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) =>//StageDeathInfos info//HttpRequest request
 // stageDeathInfos
 {
@@ -130,7 +131,7 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
                 EnemyPositionY=d.EnemyPosition.y
             });
         }
-        db.userStageDeathInfo.Add(stageEntity);
+        db.StageDeathInfo.Add(stageEntity);
     }
 
 
@@ -178,12 +179,40 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
     return Results.NoContent();
 });
 
-app.MapPatch("userplaydata/{id}/stageDeath", async (int id, StageDeathInfo info, PlaytestDb db) =>
+
+app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, PlaytestDb db) =>
 {
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
-
-
+    Console.WriteLine($"{id} 번 stageDeath ");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
     // var data = await db.userStageDeathInfo.FindAsync(id);
+    var data = await db.userplaydata.FindAsync(id);
+
+    //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
+    foreach(var s in info.stageDeathInfos)
+    {
+        var stageEntity = new StageDeathInfo
+        {
+            PlayresultId = id,//stageid는 자동 증가라 넣을 필요없음
+            StageName = s.stageName,
+            DeathCount = s.DeathCount
+        };
+        foreach(var d in s.deathinfos)
+        {
+            stageEntity.DeathInfos.Add(new DeathInfo
+            {
+                EnemyName=d.EnemyName,
+                DeathPositionX = d.deathPosition.x,
+                DeathPositionY=d.deathPosition.y,
+                EnemyPositionX=d.EnemyPosition.x,
+                EnemyPositionY=d.EnemyPosition.y
+            });
+        }
+        //data.StageDeathInfos.Add(stageEntity);//1번 이게 유저값을 찾아서 거기 넎는다에 더 정확하지 않나?
+        db.StageDeathInfo.Add(stageEntity);//2번
+        await db.SaveChangesAsync();
+    }
+
+
     // if (data is null)
     // {
     //     return Results.NotFound();
@@ -192,7 +221,33 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, StageDeathInfo info,
     // data.DeathInfos=info.DeathInfos;
     // data.DeathCount=info.DeathCount;
     // await db.SaveChangesAsync();
-    Console.WriteLine($"{id} 번 stageDeath ");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
+    // Console.WriteLine($"stageDeath info \n {info.StageName}, {info.}");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
+
+
+    //받은 데이터 화익부분
+    for (int i = 0; i < info.stageDeathInfos.Count; i++)
+    {
+        Console.WriteLine("========================================");
+        Console.WriteLine(info.stageDeathInfos.Count);//보내도 자꾸 개수가 0이라고 나오네 클라이언트에서는 0이라고 나오면 안 되긴함
+        Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[i].stageName}");
+        Console.WriteLine($"[Stage Receipt] 총 사망 횟수: {info.stageDeathInfos[i].DeathCount}");
+        Console.WriteLine($"[Stage Receipt] 연결된 플레이 ID: {info.stageDeathInfos[i].playresultId}");
+        if (info.stageDeathInfos[i].deathinfos != null && info.stageDeathInfos[i].deathinfos.Count > 0)
+        {
+            Console.WriteLine($"--- 상세 사망 정보 ({info.stageDeathInfos[i].deathinfos.Count}건) ---");
+            foreach (var death in info.stageDeathInfos[i].deathinfos)
+            {
+                Console.WriteLine($"- 원인 적: {death.EnemyName}");
+                Console.WriteLine($"  내 위치: ({death.deathPosition.x}, {death.deathPosition.y})");
+                Console.WriteLine($"  적 위치: ({death.EnemyPosition.x}, {death.EnemyPosition.y})");
+            }
+        }
+        else
+        {
+            Console.WriteLine("--- 상세 사망 정보가 없습니다. ---");
+        }
+        Console.WriteLine("========================================");
+    }
     return Results.NoContent();
 });
 
