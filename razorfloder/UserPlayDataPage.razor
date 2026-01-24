@@ -1,0 +1,45 @@
+@page "/userplaydata"
+@namespace razorfloder
+@using Microsoft.EntityFrameworkCore
+@using System.Threading.Tasks
+@using UnityServerProject.Data;
+@inject NavigationManager Navigation
+@inject IDbContextFactory<PlaytestDb> DbFactory
+<h1>User Play Data Page</h1>
+<button @onclick="GoHome">홈으로</button>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 여기에 초기화 코드 작성
+        @* using var db = await DbFactory.CreateDbContextAsync();
+        var data = await db.userplaydata.ToListAsync();
+        Console.WriteLine("User Play Data Loaded");
+
+        Console.WriteLine("========================================");
+        Console.WriteLine($"[Blazor Page] 데이터 출력 - 총 {data.Count}건");
+        Console.WriteLine("========================================"); *@
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            using var db = await DbFactory.CreateDbContextAsync();
+            var data = await db.userplaydata.ToListAsync();
+            Console.WriteLine("User Play Data Loaded");
+
+            Console.WriteLine("========================================");
+            Console.WriteLine($"[Blazor Page] 데이터 출력 - 총 {data.Count}건");
+            Console.WriteLine("========================================");
+        }
+        //return await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/",forceLoad: true);
+    }
+}

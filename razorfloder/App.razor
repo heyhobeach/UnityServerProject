@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Components.Web  @* ← 이 줄이 반드시 있어야 InteractiveServer를 인식합니다 *@
+@using Microsoft.AspNetCore.Components.Routing
+@namespace razorfloder
+@using razorfloder
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <HeadOutlet />
+</head>
+<body>
+    @* 여기서 InteractiveServer 모드를 설정해야 버튼 이벤트가 작동합니다 *@
+    <razorfloder.Routes @rendermode="RenderMode.InteractiveServer" />
+
+    @* 이 스크립트가 반드시 있어야 합니다! *@
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

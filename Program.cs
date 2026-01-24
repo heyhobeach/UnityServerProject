@@ -3,9 +3,12 @@ using Microsoft.Extensions.Options;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using UnityServerProject.Data;
 using UnityServerProject.Model;
-
+using razorfloder;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+//blazor 서비스 등록
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 // Add services to the container.
 
@@ -14,7 +17,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<PlaytestDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 //builder.Services.AddMvc();//?
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 21)); // MySQL version 8.0.21 or higher is recommended
-builder.Services.AddDbContext<PlaytestDb>(opt =>
+builder.Services.AddDbContextFactory<PlaytestDb>(opt =>
 {
     var connectionstring = builder.Configuration.GetConnectionString("UserDb");//mysql 설정에 대해서 appsettings.json에 작성되어 있음  현재 나는 JackTheReaperDB라는 데이터베이스를 사용하지만 appsettings에서는 UserDb로 정리 되어있음
     if (connectionstring == null)
@@ -34,16 +37,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseStaticFiles();
+app.UseAntiforgery();
+
 //
 //minimal api사용중이며 각 요청별로 내용을 정리한것임
 //minimal api에서 의존성 주입을 자체적으로 진행해서 이렇게 사용 가능함
-var userplaydata = app.MapGroup("/userplaydata");
+var userplaydata = app.MapGroup("/api/userplaydata");
+
+//app.MapGet("/", () => "Hello World!");   
+
 // access denied 되어 있는데 왜 그럴까 로컬에서 접속은 문제 없는데 
-app.MapGet("/userplaydata", async (PlaytestDb db) =>
-{
-    await db.userplaydata.ToListAsync();//여기가 이제 문제 같아 보이는데
-    Console.WriteLine("데이터 출력");
-});
+// app.MapGet("/userplaydata", async (PlaytestDb db) =>
+// {
+//     await db.userplaydata.ToListAsync();
+//     Console.WriteLine("데이터 출력");
+// });
+
+ app.MapGet("/api/userplaydata", async (PlaytestDb db) =>
+ {
+     var data = await db.userplaydata.ToListAsync();
+     Console.WriteLine("데이터 출력");
+     return Results.Ok(data);
+ }); 
 //app.MapGet("/userplaydata/complete", async (PlaytestDb db) => await db.Todos.Where(t => t.IsComplete).ToListAsync());
 app.MapGet("/userplaydata/{id}", async (int id, PlaytestDb db) => await db.userplaydata.FindAsync(id) is Playresult todo ? Results.Ok(todo) : Results.NotFound());
 app.MapPost("/userplaydata", async (Playresult data, PlaytestDb db) =>
@@ -70,7 +86,7 @@ app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
-app.MapDelete("/userplaydata/{id}", async (int id, PlaytestDb db) =>
+app.MapDelete("/userplaydata/{id}", async (int id, PlaytestDb db) =>    
 {
     // if (id == 100)
     // {
@@ -180,6 +196,7 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
 });
 
 
+//현재 문제점 있는 데이터도 
 app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, PlaytestDb db) =>
 {
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
@@ -190,6 +207,18 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
     foreach(var s in info.stageDeathInfos)
     {
+        //삽입하려는 데이터가 중복인지 확인이 필요함
+        //만약 내용이 전부 stageid를 제외하고 모든것이 동일하다면 중복으로 판단하고 삽입하지 않음
+
+        if (data != null)
+        {
+            if(data.Id==s.stageId&&data.StageDeathInfos[id].StageName==s.stageName)
+            {
+                Console.WriteLine($"[Stage Receipt] 스테이지: {s.stageName}는 이미 존재합니다.");
+                continue;
+            }
+        }
+
         var stageEntity = new StageDeathInfo
         {
             PlayresultId = id,//stageid는 자동 증가라 넣을 필요없음
@@ -267,4 +296,5 @@ if (app.Environment.IsDevelopment())
 //app.MapControllers();
 //
 //app.MapGet("/", () => "hello world!");
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode(); //여기 부분이 계속 문제임
 app.Run();

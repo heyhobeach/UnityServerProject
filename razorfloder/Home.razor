@@ -1,0 +1,26 @@
+@page "/"
+@namespace razorfloder
+@inject NavigationManager Navigation
+
+@* 
+   만약 App.razor에서 @rendermode를 설정하지 않았다면 
+   여기 최상단에 @rendermode InteractiveServer 를 적어줘야 버튼이 작동합니다.
+*@
+
+<h1>Hello, Blazor!</h1>
+<button @onclick="RedirectUserData">유저 데이터</button>
+<button @onclick="RedirectStageData">스테이지 데이터</button>
+
+<p>Welcome to your Blazor Server application.</p>
+
+@code {
+    private void RedirectUserData()
+    {
+        Navigation.NavigateTo("/userplaydata",forceLoad: true);
+    }
+
+    private void RedirectStageData()
+    {
+        Navigation.NavigateTo("/stagedeathinfo");
+    }
+}
