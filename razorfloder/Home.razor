@@ -8,10 +8,16 @@
 *@
 
 <h1>Hello, Blazor!</h1>
-<button @onclick="RedirectUserData">유저 데이터</button>
-<button @onclick="RedirectStageData">스테이지 데이터</button>
 
 <p>Welcome to your Blazor Server application.</p>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RedirectUserData">
+    유저 데이터
+</MudButton>
+
+<MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="RedirectStageData">
+    스테이지 데이터
+</MudButton>
+
 
 @code {
     private void RedirectUserData()

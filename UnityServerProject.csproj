@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <!-- API 문서(Swagger)를 위한 패키지 -->
+    <PackageReference Include="MudBlazor" Version="8.15.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 
     <!-- Pomelo MySQL 드라이버. 8.0.3 버전 대신 안정성이 확인된 8.0.2 버전을 사용합니다. -->

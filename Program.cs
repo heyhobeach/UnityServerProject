@@ -4,6 +4,7 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using UnityServerProject.Data;
 using UnityServerProject.Model;
 using razorfloder;
+using MudBlazor.Services; // 상단에 추가
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMudServices(); // MudBlazor 서비스 등록
+builder.Services.AddRazorComponents() // Blazor 컴포넌트 사용 설정
+    .AddInteractiveServerComponents();
 
 var app = builder.Build();
 app.UseStaticFiles();

@@ -3,55 +3,42 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.VisualBasic
 @using UnityServerProject.Data; 
+
 @inject NavigationManager Navigation
 @inject IDbContextFactory<PlaytestDb> DbFactory
 
 @* 여기 이제 데이터 가져올수있도록 해야함 *@
-<h1>스테이지 데스 정보</h1>
-<button @onclick="GoHome">홈으로</button>
-<button @onclick="DataDownloadCSV">CSV 다운로드</button>
-<h1>@datacount</h1>
-<ull>
-    @foreach (UnityServerProject.Model.StageDeathInfo i in @info)
-    {
-        //<li>스테이지 데스 정보 (@i.DeathInfos) 데스 정보 개수 (@i.DeathInfos.Count)</li>
-        <table class ="thead-dark">
-            @* <thead class="table-dark">
-                <tr>
-                    <th style="width: 20%">적 이름</th>
-                    <th style="width: 20%">내 위치</th>
-                    <th style="width: 20%">적 위치</th>
-                </tr>
-            </thead> *@
-            <tbody>
-                @foreach(UnityServerProject.Model.DeathInfo death in i.DeathInfos)
-                {
-                    <tr>
-                        <td>@death.EnemyName</td>
-                        <td>(@death.DeathPositionX, @death.DeathPositionY)</td>
-                        <td>(@death.EnemyPositionX, @death.EnemyPositionY)</td>
-                    </tr>
-
-                }
-
-            </tbody>
-
-        </table>
-    }
-</ull>
+<MudHeading>스테이지 데스 정보</MudHeading>
+<MudButton @onclick="GoHome">홈으로</MudButton>
+<MudButton @onclick="DataDownloadCSV">CSV 다운로드</MudButton>
+<MudHeading>@datacount</MudHeading>
+<MudTable Items="@mergeinfo" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" class="thead-dark mt-4">
+    <HeaderContent>
+        <MudTh>적 이름</MudTh>
+        <MudTh>내 위치</MudTh>
+        <MudTh>적 위치</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="적 이름">@context.EnemyName</MudTd>
+        <MudTd DataLabel="내 위치">(@context.DeathPositionX, @context.DeathPositionY)</MudTd>
+        <MudTd DataLabel="적 위치">(@context.EnemyPositionX, @context.EnemyPositionY)</MudTd>
+    </RowTemplate>
+</MudTable>
 @code {
     @* 여기에 스테이지 데스 정보 관련 코드 작성 *@
+    private bool _loading = false;
     private int datacount = 0;
     private List<UnityServerProject.Model.StageDeathInfo> info = new List<UnityServerProject.Model.StageDeathInfo>();
     private List<UnityServerProject.Model.DeathInfo> deathInfos = new List<UnityServerProject.Model.DeathInfo>();
-
+    private List<UnityServerProject.Model.DeathInfo> mergeinfo = new List<UnityServerProject.Model.DeathInfo>();
     protected override async Task OnInitializedAsync()
     {
         using var db = await DbFactory.CreateDbContextAsync();
         @* var info = await db.StageDeathInfo.Include(s => s.DeathInfos).ToListAsync(); *@
         //var info = await db.StageDeathInfo.ToListAsync();
         info = await db.StageDeathInfo.Include(s => s.DeathInfos).ToListAsync();//db.StageDeathInfo.ToListAsync();//이렇게 하니 가져오는데 이전에 그냥 ToList와 무슨 차이가 있지
-
+        mergeinfo = info.SelectMany(s => s.DeathInfos).ToList(); 
+        _loading = true;
         Console.WriteLine("Stage Death Info Loaded");
         datacount = info.Count();
         

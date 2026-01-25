@@ -12,10 +12,13 @@
     <HeadOutlet />
 </head>
 <body>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     @* 여기서 InteractiveServer 모드를 설정해야 버튼 이벤트가 작동합니다 *@
     <razorfloder.Routes @rendermode="RenderMode.InteractiveServer" />
 
     @* 이 스크립트가 반드시 있어야 합니다! *@
     <script src="_framework/blazor.web.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 </html>
