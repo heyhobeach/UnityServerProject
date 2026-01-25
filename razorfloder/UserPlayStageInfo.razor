@@ -9,15 +9,34 @@
 @* 여기 이제 데이터 가져올수있도록 해야함 *@
 <h1>스테이지 데스 정보</h1>
 <button @onclick="GoHome">홈으로</button>
+<button @onclick="DataDownloadCSV">CSV 다운로드</button>
 <h1>@datacount</h1>
 <ull>
     @foreach (UnityServerProject.Model.StageDeathInfo i in @info)
     {
-        <li>스테이지 데스 정보 (@i.DeathInfos) 데스 정보 개수 (@i.DeathInfos.Count)</li>
-        @foreach(UnityServerProject.Model.DeathInfo death in i.DeathInfos)
-        {
-            <li>적 이름: @death.EnemyName, 내 위치: (@death.DeathPositionX, @death.DeathPositionY), 적 위치: (@death.EnemyPositionX, @death.EnemyPositionY)</li>
-        }
+        //<li>스테이지 데스 정보 (@i.DeathInfos) 데스 정보 개수 (@i.DeathInfos.Count)</li>
+        <table class ="thead-dark">
+            @* <thead class="table-dark">
+                <tr>
+                    <th style="width: 20%">적 이름</th>
+                    <th style="width: 20%">내 위치</th>
+                    <th style="width: 20%">적 위치</th>
+                </tr>
+            </thead> *@
+            <tbody>
+                @foreach(UnityServerProject.Model.DeathInfo death in i.DeathInfos)
+                {
+                    <tr>
+                        <td>@death.EnemyName</td>
+                        <td>(@death.DeathPositionX, @death.DeathPositionY)</td>
+                        <td>(@death.EnemyPositionX, @death.EnemyPositionY)</td>
+                    </tr>
+
+                }
+
+            </tbody>
+
+        </table>
     }
 </ull>
 @code {
@@ -78,5 +97,12 @@
     private void GoHome()
     {
         Navigation.NavigateTo("/",forceLoad: true);
+    }
+    private void DataDownloadCSV()
+    {
+        // CSV 다운로드 기능 구현
+        //Navigation.NavigateTo("/download/stagedeathinfo/csv", forceLoad: true);
+        //기능 구현해야함
+        Console.WriteLine("CSV 다운로드 기능이 호출되었습니다.");
     }
 }

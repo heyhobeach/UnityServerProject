@@ -7,6 +7,7 @@
 @inject IDbContextFactory<PlaytestDb> DbFactory
 <h1>User Play Data Page</h1>
 <button @onclick="GoHome">홈으로</button>
+<button @onclick="DataDownloadCSV">CSV 다운로드</button>
 
 
 @code {
@@ -41,5 +42,12 @@
     private void GoHome()
     {
         Navigation.NavigateTo("/",forceLoad: true);
+    }
+    private void DataDownloadCSV()
+    {
+        // CSV 다운로드 기능 구현
+        //Navigation.NavigateTo("/download/userplaydata/csv", forceLoad: true);
+        //기능 구현해야함
+        Console.WriteLine("CSV 다운로드 기능이 호출되었습니다.");
     }
 }
