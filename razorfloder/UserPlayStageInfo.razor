@@ -1,18 +1,20 @@
 @page "/stagedeathinfo"
 @namespace razorfloder
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.VisualBasic
+@using System.Threading.Tasks
 @using UnityServerProject.Data; 
-
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 @inject IDbContextFactory<PlaytestDb> DbFactory
 
 @* 여기 이제 데이터 가져올수있도록 해야함 *@
 <MudHeading>스테이지 데스 정보</MudHeading>
-<MudButton @onclick="GoHome">홈으로</MudButton>
-<MudButton @onclick="DataDownloadCSV">CSV 다운로드</MudButton>
-<MudHeading>@datacount</MudHeading>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoHome">홈으로</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DataDownloadCSV">CSV 다운로드</MudButton>
 <MudTable Items="@mergeinfo" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" class="thead-dark mt-4">
+    @*context는 blazor에서 일종의 약속임 그래서 Items를 context로 사용함*@
     <HeaderContent>
         <MudTh>적 이름</MudTh>
         <MudTh>내 위치</MudTh>
@@ -31,18 +33,20 @@
     private List<UnityServerProject.Model.StageDeathInfo> info = new List<UnityServerProject.Model.StageDeathInfo>();
     private List<UnityServerProject.Model.DeathInfo> deathInfos = new List<UnityServerProject.Model.DeathInfo>();
     private List<UnityServerProject.Model.DeathInfo> mergeinfo = new List<UnityServerProject.Model.DeathInfo>();
+    //private List<UnityServerProject.Model.Playresult> playinfo = new List<UnityServerProject.Model.Playresult>();
     protected override async Task OnInitializedAsync()
     {
         using var db = await DbFactory.CreateDbContextAsync();
         @* var info = await db.StageDeathInfo.Include(s => s.DeathInfos).ToListAsync(); *@
         //var info = await db.StageDeathInfo.ToListAsync();
         info = await db.StageDeathInfo.Include(s => s.DeathInfos).ToListAsync();//db.StageDeathInfo.ToListAsync();//이렇게 하니 가져오는데 이전에 그냥 ToList와 무슨 차이가 있지
-        mergeinfo = info.SelectMany(s => s.DeathInfos).ToList(); 
+        //playinfo = await db.userplaydata.ToListAsync();
+        mergeinfo = info.SelectMany(s => s.DeathInfos).ToList();
         _loading = true;
         Console.WriteLine("Stage Death Info Loaded");
         datacount = info.Count();
-        
-         for (int i = 0; i < info.Count; i++)
+
+        for (int i = 0; i < info.Count; i++)
         {
             Console.WriteLine("========================================");
             Console.WriteLine(info.Count);//보내도 자꾸 개수가 0이라고 나오네 클라이언트에서는 0이라고 나오면 안 되긴함
@@ -57,7 +61,7 @@
             Console.WriteLine($"[Stage Receipt] 총 사망 횟수: {info[i].DeathCount}");
             Console.WriteLine($"[Stage Receipt] 연결된 플레이 ID: {info[i].PlayresultId}");
             // 2. 리스트(DeathInfos) 내부 데이터 상세 출력
-            
+
             //지금 문제가 DeathInfos여기에 데이터가 안 들어가있음 하지만 사망회수나 이런건 문제없이 저장 되어있음
             //mysql에 직접 들어가서 확인해도 데이터는 들어있음
             //결론 : DB에서 데이터를 불러올 때 DeathInfos 리스트가 제대로 로드되지 않는 문제
@@ -85,11 +89,28 @@
     {
         Navigation.NavigateTo("/",forceLoad: true);
     }
-    private void DataDownloadCSV()
+    private async Task DataDownloadCSV()
     {
         // CSV 다운로드 기능 구현
         //Navigation.NavigateTo("/download/stagedeathinfo/csv", forceLoad: true);
         //기능 구현해야함
         Console.WriteLine("CSV 다운로드 기능이 호출되었습니다.");
+        if(mergeinfo == null || mergeinfo.Count == 0)
+        {
+            Console.WriteLine("다운로드할 데이터가 없습니다.");
+            return;
+        }
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("EnemyName,DeathPositionX,DeathPositionY,EnemyPositionX,EnemyPositionY");
+
+        foreach(var item in mergeinfo){
+            sb.AppendLine($"{item.EnemyName},{item.DeathPositionX},{item.DeathPositionY},{item.EnemyPositionX},{item.EnemyPositionY}");
+        }
+
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        var fileStream = new MemoryStream(fileBytes);
+
+        var fileName =$"DeathLog_{DateTime.Now:yyyyMMdd}.csv";
+        await JS.InvokeVoidAsync("downloadCsv", fileName, new Microsoft.JSInterop.DotNetStreamReference(stream: fileStream));
     }
 }

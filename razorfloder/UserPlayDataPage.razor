@@ -3,17 +3,50 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Threading.Tasks
 @using UnityServerProject.Data;
+@using UnityServerProject.Model
 @inject NavigationManager Navigation
 @inject IDbContextFactory<PlaytestDb> DbFactory
 <h1>User Play Data Page</h1>
-<button @onclick="GoHome">홈으로</button>
-<button @onclick="DataDownloadCSV">CSV 다운로드</button>
-
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoHome">홈으로</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DataDownloadCSV">CSV 다운로드</MudButton>
+<MudTable Items="@data" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" class="thead-dark mt-4">
+    @*context는 blazor에서 일종의 약속임 그래서 Items를 context로 사용함*@
+    <HeaderContent>
+        <MudTh>플레이어 ID</MudTh>
+        <MudTh>난이도</MudTh>
+        <MudTh>시작시간</MudTh>
+        <MudTh>종료시간</MudTh>
+        <MudTh>총 사망횟수</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="플레이어 ID">@context.Id</MudTd>
+        <MudTd DataLabel="난이도">@context.IsNormal</MudTd>
+        <MudTd DataLabel="시작시간">@context.StartTime</MudTd>
+        <MudTd DataLabel="종료시간">@context.EndTime</MudTd>
+        <MudTd DataLabel="총 사망횟수">@context.DeadCount</MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
-
+    private List<Playresult> data = new List<Playresult>();
+    private  bool _loading = false; 
     protected override async Task OnInitializedAsync()
     {
+            _loading =false;
+            using var db = await DbFactory.CreateDbContextAsync();
+            data = await db.userplaydata.ToListAsync();
+            _loading = true;
+            
+            Console.WriteLine("User Play Data Loaded");
+
+            Console.WriteLine("========================================");
+            Console.WriteLine($"[Blazor Page] 데이터 출력 - 총 {data.Count}건");
+            foreach(var i in data)
+            {
+                Console.WriteLine($"ID: {i.Id}, 난이도: {i.IsNormal}, 시작시간: {i.StartTime}, 종료시간: {i.EndTime}, 총 사망횟수: {i.DeadCount}");
+            }
+            Console.WriteLine("========================================");
+        //var data = await db.userplaydata.ToListAsync();
         // 여기에 초기화 코드 작성
         @* using var db = await DbFactory.CreateDbContextAsync();
         var data = await db.userplaydata.ToListAsync();
@@ -26,16 +59,23 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        @* if (firstRender)
         {
+            _loading =false;
             using var db = await DbFactory.CreateDbContextAsync();
-            var data = await db.userplaydata.ToListAsync();
+            data = await db.userplaydata.ToListAsync();
+            _loading = true;
+            
             Console.WriteLine("User Play Data Loaded");
 
             Console.WriteLine("========================================");
             Console.WriteLine($"[Blazor Page] 데이터 출력 - 총 {data.Count}건");
+            foreach(var i in data)
+            {
+                Console.WriteLine($"ID: {i.Id}, 난이도: {i.IsNormal}, 시작시간: {i.StartTime}, 종료시간: {i.EndTime}, 총 사망횟수: {i.DeadCount}");
+            }
             Console.WriteLine("========================================");
-        }
+        } *@
         //return await base.OnAfterRenderAsync(firstRender);
     }
 
