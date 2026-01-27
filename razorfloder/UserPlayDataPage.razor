@@ -6,6 +6,7 @@
 @using UnityServerProject.Model
 @inject NavigationManager Navigation
 @inject IDbContextFactory<PlaytestDb> DbFactory
+@inject IJSRuntime JS
 <h1>User Play Data Page</h1>
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoHome">홈으로</MudButton>
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DataDownloadCSV">CSV 다운로드</MudButton>
@@ -83,11 +84,28 @@
     {
         Navigation.NavigateTo("/",forceLoad: true);
     }
-    private void DataDownloadCSV()
+    private async Task DataDownloadCSV()
     {
         // CSV 다운로드 기능 구현
         //Navigation.NavigateTo("/download/userplaydata/csv", forceLoad: true);
         //기능 구현해야함
         Console.WriteLine("CSV 다운로드 기능이 호출되었습니다.");
+        if(data == null || data.Count == 0)
+        {
+            Console.WriteLine("다운로드할 데이터가 없습니다.");
+            return;
+        }
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("PlayerId,난이도,시작시간,종료시간,총사망횟수");
+
+        foreach(var item in data){
+            sb.AppendLine($"{item.Id},{item.IsNormal},{item.StartTime},{item.EndTime},{item.DeadCount}");
+        }
+
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        var fileStream = new MemoryStream(fileBytes);
+
+        var fileName =$"DeathLog_{DateTime.Now:yyyyMMdd}.csv";
+        await JS.InvokeVoidAsync("downloadCsv", fileName, new Microsoft.JSInterop.DotNetStreamReference(stream: fileStream));
     }
 }
