@@ -27,7 +27,7 @@ namespace UnityServerProject.Model{
     {
         public int stageId {get;set;}
         public int playresultId{get;set;}
-        public string stageName{get;set;}
+        public string StageName{get;set;}
         public int DeathCount{get;set;}
         public List<DeathInfoRequest> deathinfos {get;set;}
     }

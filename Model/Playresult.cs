@@ -30,4 +30,21 @@
     {
         public long EndTime{ get; set; }
     }
+    public class PlayerStageDeathinfoDTO
+    {
+        public int PlayresultId{get;set;}
+        public string StageName{get;set;}
+        public int DeathId{get;set;}
+        public int StageId{get;set;}
+
+        public string ?EnemyName { get; set; }
+        public float DeathPositionX{get;set;}
+        public float DeathPositionY{get;set;}
+
+        public float EnemyPositionX{get;set;}
+        public float EnemyPositionY{get;set;}
+        // public Vector2 DeathPosition { get; set; }
+        // public Vector2 EnemyPosition { get; set; }
+    }
+    
 }

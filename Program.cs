@@ -138,7 +138,7 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
     {
         var stageEntity = new StageDeathInfo
         {
-            StageName = s.stageName,
+            StageName = s.StageName,
             DeathCount = s.DeathCount
         };
         foreach(var d in s.deathinfos)
@@ -177,7 +177,7 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
         //     Console.WriteLine("=== 받은 JSON ===");
         //     Console.WriteLine(body);
         // }
-        Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[i].stageName}");
+        Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[i].StageName}");
         Console.WriteLine($"[Stage Receipt] 총 사망 횟수: {info.stageDeathInfos[i].DeathCount}");
         Console.WriteLine($"[Stage Receipt] 연결된 플레이 ID: {info.stageDeathInfos[i].playresultId}");
         // 2. 리스트(DeathInfos) 내부 데이터 상세 출력
@@ -217,9 +217,9 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
 
         if (data != null)
         {
-            if(data.Id==s.stageId&&data.StageDeathInfos[id].StageName==s.stageName)
+            if(data.Id==s.stageId&&data.StageDeathInfos[id].StageName==s.StageName)
             {
-                Console.WriteLine($"[Stage Receipt] 스테이지: {s.stageName}는 이미 존재합니다.");
+                Console.WriteLine($"[Stage Receipt] 스테이지: {s.StageName}는 이미 존재합니다.");
                 continue;
             }
         }
@@ -227,7 +227,7 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
         var stageEntity = new StageDeathInfo
         {
             PlayresultId = id,//stageid는 자동 증가라 넣을 필요없음
-            StageName = s.stageName,
+            StageName = s.StageName,
             DeathCount = s.DeathCount
         };
         foreach(var d in s.deathinfos)
@@ -263,7 +263,7 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
     {
         Console.WriteLine("========================================");
         Console.WriteLine(info.stageDeathInfos.Count);//보내도 자꾸 개수가 0이라고 나오네 클라이언트에서는 0이라고 나오면 안 되긴함
-        Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[i].stageName}");
+        Console.WriteLine($"[Stage Receipt] 스테이지: {info.stageDeathInfos[i].StageName}");
         Console.WriteLine($"[Stage Receipt] 총 사망 횟수: {info.stageDeathInfos[i].DeathCount}");
         Console.WriteLine($"[Stage Receipt] 연결된 플레이 ID: {info.stageDeathInfos[i].playresultId}");
         if (info.stageDeathInfos[i].deathinfos != null && info.stageDeathInfos[i].deathinfos.Count > 0)

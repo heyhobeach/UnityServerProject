@@ -16,11 +16,15 @@
 <MudTable Items="@mergeinfo" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" class="thead-dark mt-4">
     @*context는 blazor에서 일종의 약속임 그래서 Items를 context로 사용함*@
     <HeaderContent>
+        <MudTh>플레이어 ID</MudTh>
+        <MudTh>스테이지 이름</MudTh>
         <MudTh>적 이름</MudTh>
         <MudTh>내 위치</MudTh>
         <MudTh>적 위치</MudTh>
     </HeaderContent>
     <RowTemplate>
+        <MudTd DataLabel="플레이어 ID">@context.PlayresultId</MudTd>
+        <MudTd DataLabel="스테이지 이름">@context.StageName</MudTd>
         <MudTd DataLabel="적 이름">@context.EnemyName</MudTd>
         <MudTd DataLabel="내 위치">(@context.DeathPositionX, @context.DeathPositionY)</MudTd>
         <MudTd DataLabel="적 위치">(@context.EnemyPositionX, @context.EnemyPositionY)</MudTd>
@@ -32,7 +36,7 @@
     private int datacount = 0;
     private List<UnityServerProject.Model.StageDeathInfo> info = new List<UnityServerProject.Model.StageDeathInfo>();
     private List<UnityServerProject.Model.DeathInfo> deathInfos = new List<UnityServerProject.Model.DeathInfo>();
-    private List<UnityServerProject.Model.DeathInfo> mergeinfo = new List<UnityServerProject.Model.DeathInfo>();
+    private List<UnityServerProject.Model.PlayerStageDeathinfoDTO> mergeinfo = new List<UnityServerProject.Model.PlayerStageDeathinfoDTO>();
     //private List<UnityServerProject.Model.Playresult> playinfo = new List<UnityServerProject.Model.Playresult>();
     protected override async Task OnInitializedAsync()
     {
@@ -41,7 +45,17 @@
         //var info = await db.StageDeathInfo.ToListAsync();
         info = await db.StageDeathInfo.Include(s => s.DeathInfos).ToListAsync();//db.StageDeathInfo.ToListAsync();//이렇게 하니 가져오는데 이전에 그냥 ToList와 무슨 차이가 있지
         //playinfo = await db.userplaydata.ToListAsync();
-        mergeinfo = info.SelectMany(s => s.DeathInfos).ToList();
+        mergeinfo = info.SelectMany(s => s.DeathInfos.Select(d => new UnityServerProject.Model.PlayerStageDeathinfoDTO
+        {
+            PlayresultId = s.PlayresultId,
+            StageName = s.StageName,
+            EnemyName = d.EnemyName,
+            DeathPositionX = d.DeathPositionX,
+            DeathPositionY = d.DeathPositionY,
+            EnemyPositionX = d.EnemyPositionX,
+            EnemyPositionY = d.EnemyPositionY
+        })).ToList();
+        
         _loading = true;
         Console.WriteLine("Stage Death Info Loaded");
         datacount = info.Count();
@@ -101,10 +115,11 @@
             return;
         }
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("EnemyName,DeathPositionX,DeathPositionY,EnemyPositionX,EnemyPositionY");
+        sb.AppendLine("PlayerId,StageName,EnemyName,DeathPositionX,DeathPositionY,EnemyPositionX,EnemyPositionY");
 
         foreach(var item in mergeinfo){
-            sb.AppendLine($"{item.EnemyName},{item.DeathPositionX},{item.DeathPositionY},{item.EnemyPositionX},{item.EnemyPositionY}");
+
+            sb.AppendLine($"{item.PlayresultId},{item.StageName},{item.EnemyName},{item.DeathPositionX},{item.DeathPositionY},{item.EnemyPositionX},{item.EnemyPositionY}");
         }
 
         var fileBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
