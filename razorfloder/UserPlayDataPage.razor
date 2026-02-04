@@ -17,6 +17,7 @@
         <MudTh>난이도</MudTh>
         <MudTh>시작시간</MudTh>
         <MudTh>종료시간</MudTh>
+        <MudTh>지속시간</MudTh>
         <MudTh>총 사망횟수</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -24,6 +25,7 @@
         <MudTd DataLabel="난이도">@context.IsNormal</MudTd>
         <MudTd DataLabel="시작시간">@context.StartTime</MudTd>
         <MudTd DataLabel="종료시간">@context.EndTime</MudTd>
+        <MudTd DataLabel="지속시간">@context.Duration</MudTd>
         <MudTd DataLabel="총 사망횟수">@context.DeadCount</MudTd>
     </RowTemplate>
 </MudTable>

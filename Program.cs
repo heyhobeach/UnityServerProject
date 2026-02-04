@@ -86,6 +86,7 @@ app.MapPut("/userplaydata/{id}", async (int id, Playresult inputData, PlaytestDb
     data.StartTime = inputData.StartTime;
     data.EndTime = inputData.EndTime;
     data.DeadCount = inputData.DeadCount;
+    data.Duration=0;//시작은 0으로 초기화
     // data.QuizResults=inputData.QuizResults;
     // data.stageDeaths=inputData.stageDeaths; //여기 부분은 어떻게 해야하지 
     await db.SaveChangesAsync();
@@ -113,6 +114,8 @@ app.MapPatch("userplaydata/{id}/EndTime", async (int id, EndTimeUpdateRequest _E
         return Results.NotFound();
     }
     data.EndTime = _EndTime.EndTime;
+    data.Duration= data.Duration+_EndTime.Duration;//지속시간 업데이트
+    Console.WriteLine($"업데이트된 지속시간: {data.Duration}"); 
     await db.SaveChangesAsync();
     return Results.NoContent();
 });

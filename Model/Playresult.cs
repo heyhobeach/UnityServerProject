@@ -16,6 +16,7 @@
         public long StartTime { get; set; }
         //수정
         public long EndTime { get; set; }
+        public long Duration { get; set; }
         public int DeadCount { get; set; }
 
         //StageDeathInfo와 연결하기 위해 필한 부분
@@ -29,6 +30,7 @@
     public class EndTimeUpdateRequest
     {
         public long EndTime{ get; set; }
+        public long Duration{ get; set; }
     }
     public class PlayerStageDeathinfoDTO
     {
