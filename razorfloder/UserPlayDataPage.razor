@@ -98,10 +98,10 @@
             return;
         }
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("PlayerId,난이도,시작시간,종료시간,총사망횟수");
+        sb.AppendLine("PlayerId,난이도,시작시간,종료시간,지속시간,총사망횟수");
 
         foreach(var item in data){
-            sb.AppendLine($"{item.Id},{item.IsNormal},{item.StartTime},{item.EndTime},{item.DeadCount}");
+            sb.AppendLine($"{item.Id},{item.IsNormal},{item.StartTime},{item.EndTime},{item.Duration},{item.DeadCount}");
         }
 
         var fileBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
