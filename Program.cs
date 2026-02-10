@@ -210,9 +210,31 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
     Console.WriteLine($"{id} 번 stageDeath ");//이게 되려나? json형태로 온다면 string으로 진행오는것 아닌가 싶기도 하고
     // var data = await db.userStageDeathInfo.FindAsync(id);
-    var data = await db.userplaydata.FindAsync(id);
+    var data = await db.userplaydata
+            .Include(u => u.PlayerChapterInfos)
+                .ThenInclude(c => c.StageDeathInfos)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    if(data==null)
+    {
+        Console.WriteLine($"플레이 결과 ID {id}를 찾을 수 없습니다.");
+        return Results.NotFound();
+    }   
+    if (info.StagePlayTime != 0)
+    {
+        Console.WriteLine($"스테이지 플레이 타임: {info.StagePlayTime}");
+    }
+    else
+    {
+        Console.WriteLine("스테이지 플레이 타임 정보가 없습니다.");
+    }
 
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
+    var ChapterEntity = new PlayerChapterInfo
+    {
+        PlayresultId = id,
+        ChapterName = $"Chapter_for_Playresult_{id}", // 임시 챕터 이름, 필요에 따라 수정
+        ChapterDuration = info.StagePlayTime
+    };
     foreach(var s in info.stageDeathInfos)
     {
         //삽입하려는 데이터가 중복인지 확인이 필요함
@@ -220,11 +242,18 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
 
         if (data != null)
         {
-            if(data.Id==s.stageId&&data.StageDeathInfos[id].StageName==s.StageName)
+            foreach(var chapter in data.PlayerChapterInfos)
             {
-                Console.WriteLine($"[Stage Receipt] 스테이지: {s.StageName}는 이미 존재합니다.");
-                continue;
+                foreach(var stage in chapter.StageDeathInfos)
+                {
+                    if(stage.StageId == s.stageId && stage.StageName == s.StageName)
+                    {
+                        Console.WriteLine($"[Stage Receipt] 스테이지: {s.StageName}는 이미 존재합니다.");
+                        continue;
+                    }
+                }
             }
+
         }
 
         var stageEntity = new StageDeathInfo
@@ -244,11 +273,12 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
                 EnemyPositionY=d.EnemyPosition.y
             });
         }
+        ChapterEntity.StageDeathInfos.Add(stageEntity);
         //data.StageDeathInfos.Add(stageEntity);//1번 이게 유저값을 찾아서 거기 넎는다에 더 정확하지 않나?
-        db.StageDeathInfo.Add(stageEntity);//2번
-        await db.SaveChangesAsync();
     }
 
+        db.PlayerChapterInfo.Add(ChapterEntity);
+        await db.SaveChangesAsync();
 
     // if (data is null)
     // {

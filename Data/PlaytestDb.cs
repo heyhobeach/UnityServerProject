@@ -11,6 +11,7 @@ namespace UnityServerProject.Data
 
         public DbSet<Model.Playresult> userplaydata => Set<Model.Playresult>();//데이터 베이스쪽이랑 동일해야함//왜 인지 여기에 문제가 생기고 있음
         public DbSet<Model.StageDeathInfo> StageDeathInfo =>Set<Model.StageDeathInfo>();//이 라인 사용시 지금 vector2 자료형 관련 버그 발생중
+        public DbSet<Model.PlayerChapterInfo> PlayerChapterInfo => Set<Model.PlayerChapterInfo>(); // 챕터 정보 테이블
         public DbSet<DeathInfo> DeathInfo { get; set; } // 자식 테이블도 명시적으로 등록
 
 

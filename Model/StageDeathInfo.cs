@@ -3,25 +3,42 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
 namespace UnityServerProject.Model
 {
-
-    public class StageDeathInfos
+        //챕터 정보 기록할 클래스
+    public class PlayerChapterInfo
     {
-        public List<StageDeathInfo> stageDeathInfos{get;set;} = new List<StageDeathInfo>();
-    } 
+        [Key]
+        public int ChapterId{get;set;}
+        public int PlayresultId { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Playresult? Playresult { get; set; }
+        public string ?ChapterName{get;set;}
+        public long ChapterDuration{get;set;}
+        public List<StageDeathInfo> StageDeathInfos {get;set;}=new();
+    }
 
 
-    //실제 DB에 저장되는 적의 죽음에 대한 정보
-    //부모는 Playresult 클래스 각각의 클래스가 테이블의 역할을 하고 있음
+
+    // 실제 DB에 저장되는 맵(스테이지) 단위의 죽음 정보
     public class StageDeathInfo
     {
         [Key]
-        public int StageId{get;set;}
+        public int StageId { get; set; }
 
-        //어떤 스테이지에서 사망했는가
-        public int PlayresultId{get;set;}
-        public string ?StageName { get; set; }
+        // Chapter와의 관계
+        public int ChapterId { get; set; }
+        [ForeignKey("ChapterId")]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public PlayerChapterInfo? PlayerChapter { get; set; }
+
+        // 어느 플레이 결과(플레이 세션)에 속하는지
+        public int PlayresultId { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Playresult? Playresult { get; set; }
+
+        public string? StageName { get; set; }
         public int DeathCount { get; set; }
-        
+
         public List<DeathInfo> DeathInfos { get; set; } = new List<DeathInfo>();
     }
 
@@ -42,9 +59,7 @@ namespace UnityServerProject.Model
         public float DeathPositionX{get;set;}
         public float DeathPositionY{get;set;}
 
-        public float EnemyPositionX{get;set;}
-        public float EnemyPositionY{get;set;}
-        // public Vector2 DeathPosition { get; set; }
-        // public Vector2 EnemyPosition { get; set; }
+        public float EnemyPositionX { get; set; }
+        public float EnemyPositionY { get; set; }
     }
 }

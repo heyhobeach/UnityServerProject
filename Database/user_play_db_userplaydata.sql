@@ -46,16 +46,33 @@ CREATE TABLE `userplaydata` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- 1. StageDeathInfo 테이블 생성
+-- 0. PlayerChapterInfo 테이블 생성 (StageDeathInfo보다 먼저 생성)
+CREATE TABLE PlayerChapterInfo (
+    ChapterId INT NOT NULL AUTO_INCREMENT, -- 플레이 세션 내 챕터 식별 id
+    PlayresultId INT NOT NULL,             -- 부모인 userplaydata(Id) 참조
+    ChapterName VARCHAR(255),
+    ChapterDuration BIGINT DEFAULT 0,
+    PRIMARY KEY (ChapterId),
+    CONSTRAINT FK_Playresult_Chapter FOREIGN KEY (PlayresultId) 
+        REFERENCES userplaydata(Id) ON DELETE CASCADE
+);
+
+
+-- 1. StageDeathInfo 테이블 생성 (ChapterId FK 추가)
 CREATE TABLE StageDeathInfo (
-    StageId INT NOT NULL AUTO_INCREMENT, -- 유저별 스테이지 사망 로그를 구분하기 위한 id
-    PlayresultId INT NOT NULL,           -- 부모인 userplaydata(Id) 참조
+    StageId INT NOT NULL AUTO_INCREMENT,   -- 유저별 스테이지 사망 로그를 구분하기 위한 id
+    ChapterId INT NOT NULL,                -- PlayerChapterInfo(ChapterId) 참조
+    PlayresultId INT NOT NULL,             -- 부모인 userplaydata(Id) 참조
     StageName VARCHAR(255),
     DeathCount INT DEFAULT 0,
+    Duration BIGINT DEFAULT 0,
     PRIMARY KEY (StageId),
+    CONSTRAINT FK_Chapter FOREIGN KEY (ChapterId) 
+        REFERENCES PlayerChapterInfo(ChapterId) ON DELETE CASCADE,
     CONSTRAINT FK_Playresult FOREIGN KEY (PlayresultId) 
         REFERENCES userplaydata(Id) ON DELETE CASCADE
 );
+
 
 -- 2. DeathInfo 테이블 생성
 CREATE TABLE DeathInfo (

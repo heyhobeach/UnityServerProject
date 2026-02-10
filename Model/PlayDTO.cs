@@ -34,6 +34,7 @@ namespace UnityServerProject.Model{
     public class RootRequest
     {
         public List<StageDeathInfoRequest> stageDeathInfos {get;set;}
+        public long StagePlayTime {get;set;}
     }
 
 
