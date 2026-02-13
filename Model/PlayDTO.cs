@@ -34,7 +34,13 @@ namespace UnityServerProject.Model{
     public class RootRequest
     {
         public List<StageDeathInfoRequest> stageDeathInfos {get;set;}
-        public long StagePlayTime {get;set;}
+        //public long StagePlayTime {get;set;}
+    }
+    public class ChapterClearInfoRequest
+    {
+        public long ChapterDuration{get;set;}
+        public string ?ChapterName{get;set;}
+
     }
 
 

@@ -203,6 +203,29 @@ app.MapPatch("userplaydata/stageDeath", async (RootRequest info, PlaytestDb db) 
     return Results.NoContent();
 });
 
+app.MapPatch("userplaydata/{id}/chapterClearTime", async (int id, ChapterClearInfoRequest info, PlaytestDb db) =>
+{
+    Console.WriteLine("챕터 클리어 시간 업데이트 요청 받음");
+    var data = await db.userplaydata.Include(u=>u.PlayerChapterInfos).FirstOrDefaultAsync(u=>u.Id==id); 
+    if (data is null)
+    {
+        Console.WriteLine($"플레이 결과 ID {id}를 찾을 수 없습니다.");  
+        return Results.NotFound();
+    }
+
+    Console.WriteLine($"챕터 클리어 시간 업데이트: {info.ChapterDuration}챕터 이름 {info.ChapterName}");
+    
+    data.PlayerChapterInfos.Add(new PlayerChapterInfo
+    {
+        PlayresultId = id,
+        ChapterName = info.ChapterName,
+        ChapterDuration = info.ChapterDuration
+    });
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 
 //현재 문제점 있는 데이터도 
 app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, PlaytestDb db) =>
@@ -219,21 +242,12 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
         Console.WriteLine($"플레이 결과 ID {id}를 찾을 수 없습니다.");
         return Results.NotFound();
     }   
-    if (info.StagePlayTime != 0)
-    {
-        Console.WriteLine($"스테이지 플레이 타임: {info.StagePlayTime}");
-    }
-    else
-    {
-        Console.WriteLine("스테이지 플레이 타임 정보가 없습니다.");
-    }
 
     //유니티에서 데이터 전송후 제대로 받는지 확인하고 받는다면 출력을 시키는게 필요함
     var ChapterEntity = new PlayerChapterInfo
     {
         PlayresultId = id,
-        ChapterName = $"Chapter_for_Playresult_{id}", // 임시 챕터 이름, 필요에 따라 수정
-        ChapterDuration = info.StagePlayTime
+        ChapterName = $"Chapter_for_Playresult_{id}" // 임시 챕터 이름, 필요에 따라 수정
     };
     foreach(var s in info.stageDeathInfos)
     {
@@ -274,10 +288,13 @@ app.MapPatch("userplaydata/{id}/stageDeath", async (int id, RootRequest info, Pl
             });
         }
         ChapterEntity.StageDeathInfos.Add(stageEntity);
+        db.StageDeathInfo.Add(stageEntity);
         //data.StageDeathInfos.Add(stageEntity);//1번 이게 유저값을 찾아서 거기 넎는다에 더 정확하지 않나?
     }
 
-        db.PlayerChapterInfo.Add(ChapterEntity);
+//여기서 지금 반복 데이터 저장
+    //db.StageDeathInfo.Add(stageEntity);
+        //db.PlayerChapterInfo.Add(ChapterEntity);
         await db.SaveChangesAsync();
 
     // if (data is null)
