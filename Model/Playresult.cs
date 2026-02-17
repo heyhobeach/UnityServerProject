@@ -1,6 +1,7 @@
 ﻿namespace UnityServerProject.Model
 {
 
+    //현재 사용하지 않음
     public class QuizRecord
     {
         public string ?Answer { get; set; }
